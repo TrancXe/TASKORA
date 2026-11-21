@@ -144,7 +144,14 @@ app.post('/api/payments/khalti/verify', requireUser, async (req, res) => {
 });
   }
 });
+// Serve the built TASKORA frontend
+app.use(express.static('dist'));
 
+// Send the app page for frontend routes
+app.get('/{*splat}', (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  res.sendFile('index.html', { root: 'dist' });
+});
 app.use((err, _req, res, _next) => {
   console.error('Unhandled API error:', err.message);
   res.status(500).json({ error: 'An unexpected server error occurred.' });
