@@ -16,7 +16,19 @@ const KHALTI_SECRET_KEY = process.env.KHALTI_SECRET_KEY;
 const hasKhaltiSecret = Boolean(KHALTI_SECRET_KEY && !KHALTI_SECRET_KEY.startsWith('YOUR_'));
 
 app.disable('x-powered-by');
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      connectSrc: [
+        "'self'",
+        "https://*.supabase.co",
+        "wss://*.supabase.co"
+      ]
+    }
+  }
+}));
 app.use(cors({ origin: APP_URL, methods: ['GET', 'POST'], allowedHeaders: ['Content-Type', 'Authorization'] }));
 app.use(express.json({ limit: '30kb' }));
 app.use('/api/payments', rateLimit({ windowMs: 60_000, limit: 12, standardHeaders: 'draft-8', legacyHeaders: false }));
